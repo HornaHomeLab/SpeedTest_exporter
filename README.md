@@ -1,4 +1,5 @@
 # Internet_SpeedTest_exporter
+##### version: 0.0.1
 
 Containerized prometheus exporter for speedTest by Ookla.
 All data available in speedtest cli are exposed for Prometheus to scrape.
