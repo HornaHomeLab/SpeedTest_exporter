@@ -1,6 +1,6 @@
 services:
   SpeedTest_Exporter:
-      image: horna-home-lab/speedtest_exporter
+      image: ${IMAGE_NAME}
       build:
         context: ./
         dockerfile: Dockerfile
