@@ -17,7 +17,11 @@ It is containerized FastAPI based application to periodically perform internet S
 
 Speedtests are performed in the background based on specified in `.env` frequency.
 Last speedtest result is available on `./metrics` endpoint. 
+Additionally there is `/runOnDemand` to trigger speedtest execution on demand.
 If program could not perform a test it will set all numeric values to 0 and string values to `-`
+
+> [!IMPORTANT] 
+> `/runOnDemand` endpoint can be used with `POST` method only.
 
 ## Grafana Dashboard
 ![image](/Grafana/Pictures/Grafana_dashboard.png)
