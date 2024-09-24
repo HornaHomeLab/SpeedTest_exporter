@@ -22,10 +22,10 @@ class ConnectivityMetrics:
     @staticmethod
     def __update_ping_metrics(pings: list[PingModel]):
         for ping in pings:
-            ConnectivityMetrics.__ping_loss.labels({"ip": ping.ip}).set(ping.loss)
-            ConnectivityMetrics.__ping_latency_min.labels({"ip": ping.ip}).set(ping.latency_min)
-            ConnectivityMetrics.__ping_latency_max.labels({"ip": ping.ip}).set(ping.latency_max)
-            ConnectivityMetrics.__ping_latency_avg.labels({"ip": ping.ip}).set(ping.latency_avg)
+            ConnectivityMetrics.__ping_loss.labels(**{"ip": ping.ip}).set(ping.loss)
+            ConnectivityMetrics.__ping_latency_min.labels(**{"ip": ping.ip}).set(ping.latency_min)
+            ConnectivityMetrics.__ping_latency_max.labels(**{"ip": ping.ip}).set(ping.latency_max)
+            ConnectivityMetrics.__ping_latency_avg.labels(**{"ip": ping.ip}).set(ping.latency_avg)
 
     @staticmethod
     def __update_traceroute_metrics(traceroutes: list[TraceRouteModel]):
