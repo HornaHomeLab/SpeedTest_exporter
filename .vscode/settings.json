@@ -1,11 +1,17 @@
 {
     "cSpell.words": [
         "asgi",
+        "dotenv",
         "fastapi",
+        "Interquartile",
+        "nslookup",
         "Ookla",
         "pydantic",
         "speedtest",
         "Speedtests",
+        "traceroute",
+        "traceroutes",
+        "tracert",
         "uvicorn"
     ]
 }

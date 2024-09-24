@@ -1,48 +1,49 @@
 import os
+import threading
 from fastapi import FastAPI
 from contextlib import asynccontextmanager
 from fastapi_utils.tasks import repeat_every
-from prometheus_client import make_asgi_app
-
+from src.Utils.Config import Config
 import src.Controller as Controller
-import src.Model as Model
+import src.Router as Router
 
-metrics_app = make_asgi_app()
-
-refresh_interval_period = 60 * int(os.getenv('SPEED_TEST_INTERVAL_MINUTES', 5))
-
-print("Refresh interval is set to: ", refresh_interval_period, " seconds.")
+lock = threading.Lock()
 
 
-@repeat_every(seconds=refresh_interval_period)
+@repeat_every(seconds=Config.get_speedtest_interval())
 def perform_speed_test():
-    Controller.SpeedTest.perform_speed_test()
-    print("test performed")
+    lock.acquire()
+    try:
+        Controller.SpeedTest.perform_speed_test()
+        print("Speedtest performed")
+    finally:
+        lock.release()
+
+
+@repeat_every(seconds=Config.get_connectivity_interval())
+def perform_ping_and_tracert():
+    lock.acquire()
+    try:
+        Controller.InternetAccess.perform_connectivity_check()
+        print("Connectivity check performed")
+    finally:
+        lock.release()
 
 
 @asynccontextmanager
 async def app_lifespan(app: FastAPI):
     Controller.SpeedTest.check_components()
     await perform_speed_test()
+    await perform_ping_and_tracert()
     yield
     print("Closing app")
 
 app = FastAPI(lifespan=app_lifespan)
-
-app.mount("/metrics", metrics_app)
-
-
-@app.post("/runOnDemand", response_model=Model.SpeedTest)
-def run_speedtest_on_demand():
-    '''
-        Endpoint to manually execute speedtest when needed.
-    '''
-    return (
-        Controller.SpeedTest.perform_speed_test()
-    )
+app.include_router(Router.SpeedTest)
+app.include_router(Router.Prometheus)
+app.include_router(Router.ConnectivityCheck)
 
 
 if __name__ == '__main__':
     import uvicorn
-    uvicorn.run(app, host=os.getenv('INTERFACE_IP'),
-                port=int(os.getenv('API_PORT')))
+    uvicorn.run(app, host="0.0.0.0", port="8000")

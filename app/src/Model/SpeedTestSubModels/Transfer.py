@@ -1,6 +1,6 @@
-from pydantic import BaseModel, Field, field_serializer, root_validator
+from pydantic import BaseModel, Field, field_serializer
 
-from src.Model.SpeedTest.subModels.Ping import TransferPing
+from src.Model.SpeedTestSubModels.Ping import TransferPing
 
 class Transfer(BaseModel):
     bandwidth: int = Field(default=0)

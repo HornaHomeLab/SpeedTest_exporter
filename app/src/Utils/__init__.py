@@ -1,2 +1,1 @@
-from src.Utils.PrometheusMetrics import PrometheusMetrics
 from src.Utils.SpeedTestByOokla import SpeedTestByOokla

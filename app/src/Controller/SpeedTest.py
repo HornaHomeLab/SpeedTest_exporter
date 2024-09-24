@@ -1,4 +1,5 @@
 import src.Model as Model
+from src.Prometheus.SpeedTestMetrics import SpeedTestMetrics
 import src.Utils as Utils
 
 class SpeedTest:
@@ -8,5 +9,5 @@ class SpeedTest:
     
     def perform_speed_test() -> Model.SpeedTest:
         test: Model.SpeedTest = Utils.SpeedTestByOokla.run_speedtest()
-        Utils.PrometheusMetrics.update_metrics(test)
+        SpeedTestMetrics.update_metrics(test)
         return test

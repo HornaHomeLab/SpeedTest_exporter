@@ -1,4 +1,4 @@
-from src.Model.SpeedTest.SpeedTest import SpeedTest
+from src.Model.SpeedTest import SpeedTest
 
 import shutil
 import subprocess
