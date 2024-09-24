@@ -30,4 +30,4 @@ class ConnectivityMetrics:
     @staticmethod
     def __update_traceroute_metrics(traceroutes: list[TraceRouteModel]):
         for tracert in traceroutes:
-            ConnectivityMetrics.__hops_count.labels({"ip":tracert.ip}).set(tracert.hops_count)
+            ConnectivityMetrics.__hops_count.labels(**{"ip":tracert.ip}).set(tracert.hops_count)
