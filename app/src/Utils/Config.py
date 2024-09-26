@@ -8,8 +8,7 @@ load_dotenv()
 class Config:
 
     __connectivity_check_servers: list[str] = ["1.1.1.1", "8.8.8.8", "8.8.4.4"]
-    __speed_test_interval: int = 30
-    __connectivity_interval: int = 15
+    
     __intervals: dict[str, int] = {
         "SPEEDTEST": 1800,
         "CONNECTIVITY": 15
