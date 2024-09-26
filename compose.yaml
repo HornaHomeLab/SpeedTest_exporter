@@ -9,7 +9,6 @@ services:
       restart: unless-stopped
       environment:
         TZ: ${SYSTEM_TIME_ZONE}
-        SPEED_TEST_INTERVAL_MINUTES: ${SPEED_TEST_MINUTES}
         API_PORT: ${EXTERNAL_PORT}
         INTERFACE_IP: ${IP}
       ports:
