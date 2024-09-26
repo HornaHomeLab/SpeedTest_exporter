@@ -1,12 +1,13 @@
 import subprocess
 from src.Model.Ping import Ping as PingModel
+from src.Utils.Config import Config
 
 
 class Ping:
 
     __cmd_name: str = "ping"
     __cmd_args: list[str] = ["-c", "8"]
-    __cmd_timeout: int = 10
+    __cmd_timeout: int = Config.get_subprocess_timeout("PING")
 
     @staticmethod
     def run(ip: str) -> PingModel:
@@ -21,9 +22,10 @@ class Ping:
                 .decode('utf-8')
                 .split("\n")
             )
-            
+
             result["loss"] = Ping.__get_packet_loss(out)
-            result["latency_min"], result["latency_avg"], result["latency_max"] = Ping.__get_latency(out)
+            result["latency_min"], result["latency_avg"], result["latency_max"] = Ping.__get_latency(
+                out)
         except Exception as e:
             print(e)
         response = PingModel(

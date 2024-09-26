@@ -10,7 +10,7 @@ import src.Router as Router
 lock = threading.Lock()
 
 
-@repeat_every(seconds=Config.get_speedtest_interval())
+@repeat_every(seconds=Config.get_action_interval("SPEEDTEST"))
 def perform_speed_test():
     lock.acquire()
     try:
@@ -20,7 +20,7 @@ def perform_speed_test():
         lock.release()
 
 
-@repeat_every(seconds=Config.get_connectivity_interval())
+@repeat_every(seconds=Config.get_action_interval("CONNECTIVITY"))
 def perform_ping_and_tracert():
     lock.acquire()
     try:

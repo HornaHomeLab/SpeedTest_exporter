@@ -10,24 +10,14 @@ class Config:
     __connectivity_check_servers: list[str] = ["1.1.1.1", "8.8.8.8", "8.8.4.4"]
     __speed_test_interval: int = 30
     __connectivity_interval: int = 15
-
-    @staticmethod
-    def get_speedtest_interval() -> int:
-        return int(
-            60 * int(os.getenv(
-                "SPEED_TEST_INTERVAL_MINUTES",
-                Config.__speed_test_interval
-            ))
-        )
-
-    @staticmethod
-    def get_connectivity_interval() -> int:
-        return int(
-            os.getenv(
-                "CONNECTIVITY_CHECK_INTERVAL_SECONDS",
-                Config.__connectivity_interval
-            )
-        )
+    __intervals: dict[str, int] = {
+        "SPEEDTEST": 1800,
+        "CONNECTIVITY": 15
+    }
+    __timeouts: dict[str, int] = {
+        "PING": 15,
+        "TRACEROUTE": 15
+    }
 
     @staticmethod
     def get_connectivity_servers() -> list[str]:
@@ -40,3 +30,26 @@ class Config:
             servers = Config.__connectivity_check_servers
 
         return servers
+    
+    @staticmethod
+    def get_action_interval(name: str) -> int:
+        name = name.upper()
+        
+        return int(
+            os.getenv(
+                "{action_name}_INTERVAL".format(
+                    action_name=name),
+                Config.__intervals[name]
+            )
+        )
+    
+    @staticmethod
+    def get_subprocess_timeout(name: str) -> int:
+        name = name.upper()
+        return int(
+            os.getenv(
+                "{subprocess_name}_TIMEOUT".format(
+                    subprocess_name=name),
+                Config.__timeouts[name]
+            )
+        )

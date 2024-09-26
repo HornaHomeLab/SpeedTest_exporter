@@ -1,11 +1,13 @@
 import subprocess
 import os
 from src.Model.TraceRoute import TraceRoute as TraceRouteModel
+from src.Utils.Config import Config
+
 
 class TraceRoute:
     __cmd_name: str = "traceroute"
-    __cmd_timeout: int = 10
-    
+    __cmd_timeout: int = Config.get_subprocess_timeout("TRACEROUTE")
+
     @staticmethod
     def run(ip: str) -> TraceRouteModel:
         result: dict[str, float] = {"ip": ip}
@@ -15,7 +17,7 @@ class TraceRoute:
                 subprocess.check_output(
                     cmd_to_run,
                     timeout=TraceRoute.__cmd_timeout,
-                    stderr=subprocess.PIPE # to suppress unnecessary traceroute prints
+                    stderr=subprocess.PIPE  # to suppress unnecessary traceroute prints
                 )
                 .decode('utf-8')
                 .split("\n")
@@ -27,19 +29,19 @@ class TraceRoute:
         return TraceRouteModel(
             **result
         )
-    
+
     @staticmethod
     def __get_cmd(ip: str):
         return [TraceRoute.__cmd_name, ip]
-    
+
     @staticmethod
     def __get_hops_number(output: list[str]) -> int:
         reverse_line_counter: int = 2
-        
+
         hops = ""
-        while(hops == ""):
-            result = output[len(output) -  reverse_line_counter]
+        while (hops == ""):
+            result = output[len(output) - reverse_line_counter]
             hops = result.split(" ")[1]
             reverse_line_counter = reverse_line_counter + 1
-            
+
         return int(hops)
