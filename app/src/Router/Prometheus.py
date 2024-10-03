@@ -18,8 +18,26 @@ def get_metrics_response(metrics_reg = REGISTRY) -> Response:
 
 @Prometheus.get(path="/metrics")
 def get_metrics():
-    return get_metrics_response(exporter_registry)
+    try:
+        return get_metrics_response(exporter_registry)
+    except Exception as e:
+        logger.exception(e, exc_info=True)
+        headers=get_response_headers()
+        raise HTTPException(
+            status_code=500,
+            detail=headers,
+            headers=headers
+        )
 
 @Prometheus.get(path="/appmetrics")
 def get_metrics():
-    return get_metrics_response()
+    try:
+        return get_metrics_response()
+    except Exception as e:
+        logger.exception(e, exc_info=True)
+        headers=get_response_headers()
+        raise HTTPException(
+            status_code=500,
+            detail=headers,
+            headers=headers
+        )

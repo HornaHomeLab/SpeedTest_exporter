@@ -3,7 +3,7 @@ from src.Model.Ping import Ping as PingModel
 import src.Config as Config
 from src.Observability import *
 
-tracer = trace.get_tracer("Ping_Util")
+tracer = trace.get_tracer("Utils/Ping")
 
 
 class Ping:

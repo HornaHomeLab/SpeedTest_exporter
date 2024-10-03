@@ -4,7 +4,7 @@ import json
 from src.Model.SpeedTest import SpeedTest
 from src.Observability import *
 
-tracer = trace.get_tracer("SpeedTest_Util")
+tracer = trace.get_tracer("Utils/SpeedTestByOokla")
 
 
 class SpeedTestByOokla:

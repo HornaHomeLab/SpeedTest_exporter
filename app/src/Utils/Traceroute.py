@@ -3,7 +3,7 @@ from src.Model.TraceRoute import TraceRoute as TraceRouteModel
 import src.Config as Config
 from src.Observability import *
 
-tracer = trace.get_tracer("TraceRoute_Util")
+tracer = trace.get_tracer("Utils/TraceRoute")
 
 
 class TraceRoute:

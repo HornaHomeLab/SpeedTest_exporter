@@ -9,7 +9,7 @@ from src.Observability import *
 
 lock = threading.Lock()
 
-tracer = trace.get_tracer("Scheduled_Jobs")
+tracer = trace.get_tracer("Main/Scheduled_Jobs")
 
 
 @repeat_every(seconds=Config.SPEEDTEST_INTERVAL)

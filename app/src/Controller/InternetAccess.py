@@ -8,7 +8,7 @@ from src.Model.ConnectivityCheck import ConnectivityCheck
 import src.Config as Config
 from src.Observability import *
 
-tracer = trace.get_tracer("InternetAccess_Controller")
+tracer = trace.get_tracer("Controller/InternetAccess")
 
 
 class InternetAccess:

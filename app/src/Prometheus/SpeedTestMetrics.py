@@ -6,6 +6,9 @@ from src.Model.SpeedTestSubModels.Transfer import Transfer
 from src.Model.SpeedTestSubModels.Interface import Interface
 from src.Model.SpeedTestSubModels.Server import Server
 from src.Model.SpeedTestSubModels.Result import Result
+from src.Observability import *
+
+tracer = trace.get_tracer("Prometheus/SpeedTestMetrics")
 
 
 class SpeedTestMetrics:
@@ -108,15 +111,19 @@ class SpeedTestMetrics:
     )
 
     @staticmethod
+    @tracer.start_as_current_span("SpeedTestMetrics.update_metrics")
     def update_metrics(test: SpeedTest):
+        get_current_span()
+        
         SpeedTestMetrics.__update_ping_metrics(test.ping)
         SpeedTestMetrics.__update_download_metrics(test.download)
         SpeedTestMetrics.__update_upload_metrics(test.upload)
-        SpeedTestMetrics.__update_packet_loss_and_isp(
-            test.packet_loss, test.isp)
+        SpeedTestMetrics.__update_packet_loss_and_isp(test.packet_loss, test.isp)
         SpeedTestMetrics.__update_interface(test.interface)
         SpeedTestMetrics.__update_server(test.server)
         SpeedTestMetrics.__update_result(test.result)
+        
+        set_current_span_status()
 
     @staticmethod
     def __update_ping_metrics(obj: NoWorkloadPing):

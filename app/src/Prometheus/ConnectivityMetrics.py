@@ -2,6 +2,9 @@ from prometheus_client import Gauge
 from src.Prometheus.Registry import exporter_registry
 from src.Model.Ping import Ping as PingModel
 from src.Model.TraceRoute import TraceRoute as TraceRouteModel
+from src.Observability import *
+
+tracer = trace.get_tracer("Prometheus/ConnectivityMetrics")
 
 labels = ["ip"]
 
@@ -29,24 +32,57 @@ class ConnectivityMetrics:
     )
 
     @staticmethod
+    @tracer.start_as_current_span("ConnectivityMetrics.update_metrics")
     def update_metrics(pings: list[PingModel], traceroutes: list[TraceRouteModel]):
+
+        get_current_span()
+
         ConnectivityMetrics.__update_ping_metrics(pings)
         ConnectivityMetrics.__update_traceroute_metrics(traceroutes)
+
+        set_current_span_status()
 
     @staticmethod
     def __update_ping_metrics(pings: list[PingModel]):
         for ping in pings:
             ConnectivityMetrics.__ping_loss.labels(
-                **{"ip": ping.ip}).set(ping.loss)
+                **{
+                    "ip": ping.ip
+                }
+            ).set(ping.loss)
             ConnectivityMetrics.__ping_latency_min.labels(
-                **{"ip": ping.ip}).set(ping.latency_min)
+                **{
+                    "ip": ping.ip
+                }
+            ).set(ping.latency_min)
             ConnectivityMetrics.__ping_latency_max.labels(
-                **{"ip": ping.ip}).set(ping.latency_max)
+                **{
+                    "ip": ping.ip
+                }
+            ).set(ping.latency_max)
             ConnectivityMetrics.__ping_latency_avg.labels(
-                **{"ip": ping.ip}).set(ping.latency_avg)
+                **{
+                    "ip": ping.ip
+                }
+            ).set(ping.latency_avg)
+
+        logger.info(
+            "Ping metrics updated for {num} tests.".format(
+                num=len(pings)
+            )
+        )
 
     @staticmethod
     def __update_traceroute_metrics(traceroutes: list[TraceRouteModel]):
         for tracert in traceroutes:
             ConnectivityMetrics.__hops_count.labels(
-                **{"ip": tracert.ip}).set(tracert.hops_count)
+                **{
+                    "ip": tracert.ip
+                }
+            ).set(tracert.hops_count)
+
+        logger.info(
+            "Traceroute metrics updated for {num} tests.".format(
+                num=len(traceroutes)
+            )
+        )
