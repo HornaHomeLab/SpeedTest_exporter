@@ -40,10 +40,17 @@ class ConnectivityMetrics:
         ConnectivityMetrics.__update_ping_metrics(pings)
         ConnectivityMetrics.__update_traceroute_metrics(traceroutes)
 
+        logger.info(
+            "Pings and trace routes metrics updated"
+        )
         set_current_span_status()
 
     @staticmethod
+    @tracer.start_as_current_span("ConnectivityMetrics.__update_ping_metrics")
     def __update_ping_metrics(pings: list[PingModel]):
+
+        get_current_span()
+
         for ping in pings:
             ConnectivityMetrics.__ping_loss.labels(
                 **{
@@ -71,9 +78,14 @@ class ConnectivityMetrics:
                 num=len(pings)
             )
         )
+        set_current_span_status()
 
     @staticmethod
+    @tracer.start_as_current_span("ConnectivityMetrics.__update_traceroute_metrics")
     def __update_traceroute_metrics(traceroutes: list[TraceRouteModel]):
+
+        get_current_span()
+
         for tracert in traceroutes:
             ConnectivityMetrics.__hops_count.labels(
                 **{
@@ -86,3 +98,5 @@ class ConnectivityMetrics:
                 num=len(traceroutes)
             )
         )
+
+        set_current_span_status()

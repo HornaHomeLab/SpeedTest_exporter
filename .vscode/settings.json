@@ -11,6 +11,7 @@
         "Ookla",
         "opentelemetry",
         "otel",
+        "otlp",
         "pydantic",
         "semconv",
         "speedtest",

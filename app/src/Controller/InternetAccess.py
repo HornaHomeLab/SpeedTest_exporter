@@ -16,9 +16,9 @@ class InternetAccess:
     @staticmethod
     @tracer.start_as_current_span("InternetAccess.perform_connectivity_check")
     def perform_connectivity_check() -> ConnectivityCheck:
-        
+
         get_current_span()
-        
+
         traceroutes: list[TraceRouteModel] = InternetAccess.traceroute()
         pings: list[PingModel] = InternetAccess.ping()
 
@@ -30,22 +30,29 @@ class InternetAccess:
                 "TraceRoutes": traceroutes
             }
         )
-        
+
         set_current_span_status()
-        
+
         return result
 
     @staticmethod
     @tracer.start_as_current_span("InternetAccess.ping")
     def ping(servers: list[str] = Config.CONNECTIVITY_SERVERS) -> list[PingModel]:
+
         ping_threads: list[threading.Thread] = []
         tests: list[PingModel] = []
         otel_context = context.get_current()
-        
-        @tracer.start_as_current_span("__ping_thread",context=otel_context)
+        logger.info(
+            "Ping method called",
+            extra={
+                "servers_to_check": servers
+            }
+        )
+
+        @tracer.start_as_current_span("__ping_thread", context=otel_context)
         def __ping_thread(ip: str):
             span = get_current_span()
-            span.set_attribute("ip_to_test",ip)
+            span.set_attribute("ip_to_test", ip)
             tests.append(
                 Ping.run(ip)
             )
@@ -56,6 +63,11 @@ class InternetAccess:
                 threading.Thread(target=__ping_thread, args=(ip,))
             )
             ping_threads[-1].start()
+            logger.info(
+                "Ping for {ip} started.".format(
+                    ip=ip
+                )
+            )
 
         for thread in ping_threads:
             thread.join()
@@ -66,14 +78,21 @@ class InternetAccess:
     @staticmethod
     @tracer.start_as_current_span("InternetAccess.traceroute")
     def traceroute(servers: list[str] = Config.CONNECTIVITY_SERVERS) -> list[TraceRouteModel]:
+
         tracert_threads: list[threading.Thread] = []
         tests: list[TraceRouteModel] = []
         otel_context = context.get_current()
+        logger.info(
+            "Traceroute method called",
+            extra={
+                "servers_to_check": servers
+            }
+        )
 
-        @tracer.start_as_current_span("__tracert_thread",context=otel_context)
+        @tracer.start_as_current_span("__tracert_thread", context=otel_context)
         def __tracert_thread(ip: str):
             span = get_current_span()
-            span.set_attribute("ip_to_test",ip)
+            span.set_attribute("ip_to_test", ip)
             tests.append(
                 TraceRoute.run(ip)
             )
@@ -84,9 +103,14 @@ class InternetAccess:
                 threading.Thread(target=__tracert_thread, args=(ip,))
             )
             tracert_threads[-1].start()
+            logger.info(
+                "Tracert for {ip} started.".format(
+                    ip=ip
+                )
+            )
 
         for thread in tracert_threads:
             thread.join()
-        
+
         set_current_span_status()
         return tests
