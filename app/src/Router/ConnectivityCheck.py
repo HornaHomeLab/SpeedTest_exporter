@@ -15,6 +15,8 @@ def run_connectivity_check():
     '''
     get_current_span()
     headers = get_response_headers()
+    logger.info("ConnectivityCheck on demand called")
+    
     try:
         check = Controller.InternetAccess.perform_connectivity_check()
         response = Response(

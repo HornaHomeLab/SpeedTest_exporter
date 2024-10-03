@@ -13,6 +13,8 @@ def run_speedtest_on_demand():
         This action will update exposed Prometheus metrics.
     '''
     get_current_span()
+    logger.info("SpeedTest on demand called")
+    
     headers = get_response_headers()
     try:
         speedtest: Model.SpeedTest = Controller.SpeedTest.perform_speed_test()
