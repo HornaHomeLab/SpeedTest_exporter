@@ -31,7 +31,7 @@ class SpeedTestMetrics:
     )
 
     __packet_loss = Gauge(
-        'packet_loss', 'Percentage of packets lost during the test, representing network reliability (scale 0.0 - 1.0).',
+        'packet_loss', 'Percentage of packets lost during the test, representing network reliability (scale 0.0 - 100.0).',
         registry=exporter_registry
     )
 
