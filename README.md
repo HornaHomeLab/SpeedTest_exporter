@@ -9,7 +9,7 @@
 [![CodeQL](https://github.com/HornaHomeLab/SpeedTest_exporter/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/HornaHomeLab/SpeedTest_exporter/actions/workflows/github-code-scanning/codeql)
 [![CI/CD](https://github.com/HornaHomeLab/SpeedTest_exporter/actions/workflows/ci-cd.yml/badge.svg)](https://github.com/HornaHomeLab/SpeedTest_exporter/actions/workflows/ci-cd.yml)
 
-##### version: 2.1.0
+##### version: 3.0.0
 
 Prometheus Exporter for speedTest by Ookla.
 
