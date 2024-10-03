@@ -1,17 +1,34 @@
 import subprocess
-import os
 from src.Model.TraceRoute import TraceRoute as TraceRouteModel
-from src.Utils.Config import Config
+import src.Config as Config
+from src.Observability import *
+
+tracer = trace.get_tracer("TraceRoute_Util")
 
 
 class TraceRoute:
     __cmd_name: str = "traceroute"
-    __cmd_timeout: int = Config.get_subprocess_timeout("TRACEROUTE")
+    __cmd_timeout: int = Config.TRACEROUTE_TIMEOUT
 
     @staticmethod
+    @tracer.start_as_current_span("TraceRoute.run")
     def run(ip: str) -> TraceRouteModel:
-        result: dict[str, float] = {"ip": ip}
+
+        span = get_current_span()
+        span.set_attribute("ip_to_test",ip)
+        error: bool = False
+
+        result_data: dict[str, float] = {"ip": ip}
         cmd_to_run = TraceRoute.__get_cmd(ip)
+
+        logger.info(
+            "Executing TraceRoute command",
+            extra={
+                "cmd_to_run": cmd_to_run,
+                "ip_to_test": ip
+            }
+        )
+
         try:
             out: list[str] = (
                 subprocess.check_output(
@@ -22,13 +39,16 @@ class TraceRoute:
                 .decode('utf-8')
                 .split("\n")
             )
-            result["hops_count"] = TraceRoute.__get_hops_number(out)
+            result_data["hops_count"] = TraceRoute.__get_hops_number(out)
         except Exception as e:
-            print(e)
+            error = True
+            logger.exception(e, exc_info=True)
 
-        return TraceRouteModel(
-            **result
+        result = TraceRouteModel(
+            **result_data
         )
+        set_current_span_status(error)
+        return result
 
     @staticmethod
     def __get_cmd(ip: str):

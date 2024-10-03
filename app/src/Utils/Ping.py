@@ -1,18 +1,36 @@
 import subprocess
 from src.Model.Ping import Ping as PingModel
-from src.Utils.Config import Config
+import src.Config as Config
+from src.Observability import *
+
+tracer = trace.get_tracer("Ping_Util")
 
 
 class Ping:
 
     __cmd_name: str = "ping"
     __cmd_args: list[str] = ["-c", "8"]
-    __cmd_timeout: int = Config.get_subprocess_timeout("PING")
+    __cmd_timeout: int = Config.PING_TIMEOUT
 
     @staticmethod
+    @tracer.start_as_current_span("Ping.run")
     def run(ip: str) -> PingModel:
+
+        span = get_current_span()
+        span.set_attribute("ip_to_test",ip)
+        error: bool = False
+
         result: dict[str, float] = {"ip": ip}
         cmd_to_run = Ping.__get_cmd(ip)
+
+        logger.info(
+            "Executing Ping command",
+            extra={
+                "cmd_to_run": cmd_to_run,
+                "ip_to_test": ip
+            }
+        )
+
         try:
             out: list[str] = (
                 subprocess.check_output(
@@ -25,12 +43,17 @@ class Ping:
 
             result["loss"] = Ping.__get_packet_loss(out)
             result["latency_min"], result["latency_avg"], result["latency_max"] = Ping.__get_latency(
-                out)
+                out
+            )
         except Exception as e:
-            print(e)
+            error = True
+            logger.exception(e, exc_info=True)
+
         response = PingModel(
             **result
         )
+
+        set_current_span_status(error)
         return response
 
     @staticmethod

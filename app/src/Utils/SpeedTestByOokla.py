@@ -1,8 +1,10 @@
-from src.Model.SpeedTest import SpeedTest
-
 import shutil
 import subprocess
 import json
+from src.Model.SpeedTest import SpeedTest
+from src.Observability import *
+
+tracer = trace.get_tracer("SpeedTest_Util")
 
 
 class SpeedTestByOokla:
@@ -27,15 +29,18 @@ class SpeedTestByOokla:
             )
 
     @staticmethod
+    @tracer.start_as_current_span("run_speedtest")
     def run_speedtest() -> SpeedTest:
-        try:
-            out_raw: bytes = SpeedTestByOokla.__run_ookla_subprocess()
-            parsed_json: dict = SpeedTestByOokla.__parse_json_output(out_raw)
-            
-        except Exception:
-            return SpeedTest()
+        get_current_span()
 
-        return SpeedTest(**parsed_json)
+        out_raw: bytes = SpeedTestByOokla.__run_ookla_subprocess()
+        parsed_json: dict = SpeedTestByOokla.__parse_json_output(out_raw)
+
+        result = SpeedTest(**parsed_json)
+        
+        set_current_span_status()
+        
+        return result
 
     @staticmethod
     def __parse_json_output(data: bytes) -> dict:
@@ -46,7 +51,10 @@ class SpeedTestByOokla:
         return parsed_json
 
     @staticmethod
+    @tracer.start_as_current_span("run_ookla_subprocess")
     def __run_ookla_subprocess() -> bytes:
+        get_current_span()
+        error: bool = False
         cmd_to_run = SpeedTestByOokla.__build_cmd_to_run()
         try:
             out = subprocess.check_output(
@@ -54,12 +62,17 @@ class SpeedTestByOokla:
                 timeout=SpeedTestByOokla.__test_timeout_seconds
             )
         except subprocess.CalledProcessError as e:
+            error=True
+            logger.exception(e, exc_info=True)
             raise Exception(e.output)
         except subprocess.TimeoutExpired as e:
+            error=True
+            logger.exception(e, exc_info=True)
             raise Exception("Execution took longer than expected")
 
+        set_current_span_status(error)
         return out
-    
+
     @staticmethod
     def __build_cmd_to_run() -> list[str]:
         return (
